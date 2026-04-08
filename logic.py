@@ -17,7 +17,7 @@ def get_category_days(year, month, category, end_date=None):
                 days += 1
             elif category == 'weekend_lunch' and day.weekday() >= 5: # 5-6 is Sat-Sun
                 days += 1
-            elif category == 'dinner':
+            else:  # for dinner and any new categories, assume daily
                 days += 1
     return days
 
