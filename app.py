@@ -47,6 +47,9 @@ budgets = load_budgets()
 # -- UI Layout --
 st.title("Family Grocery Tracker\n\n")
 
+total_budget = sum(budgets.values())
+st.metric("Total Monthly Budget", f"£{total_budget:.2f}")
+
 # 1. Input Panel (Sidebar)
 with st.sidebar:
     st.header("Log Expense")
@@ -69,7 +72,7 @@ with st.sidebar:
             with col1:
                 updated_budgets[cat] = st.number_input(f"{cat.replace('_', ' ').title()} Budget (£)", value=budg, min_value=0.0, step=1.0, format="%.2f", key=f"edit_{cat}")
             with col2:
-                if st.button("Delete", key=f"del_{cat}", help=f"Delete {cat.replace('_', ' ').title()} category"):
+                if st.button(" 🗑️ ", key=f"del_{cat}", help=f"Delete {cat.replace('_', ' ').title()} category"):
                     del budgets[cat]
                     save_budgets(budgets)
                     st.success(f"Category '{cat}' deleted!")
@@ -123,3 +126,17 @@ st.divider()
 # 3. Raw Ledger (Optional check to ensure data is saving)
 with st.expander("View Raw Transactions"):
     st.dataframe(df)
+    if not df.empty:
+        selected_indices = st.multiselect(
+            "Select transactions to delete", 
+            df.index.tolist(), 
+            format_func=lambda x: f"Row {x+1}: {df.loc[x, 'Date']} - {df.loc[x, 'Category']} - £{df.loc[x, 'Amount']:.2f}"
+        )
+        if st.button("Delete Selected Transactions"):
+            if selected_indices:
+                df = df.drop(selected_indices)
+                df.to_csv(DATA_FILE, index=False)
+                st.success("Transactions deleted!")
+                st.rerun()
+            else:
+                st.warning("No transactions selected.")
