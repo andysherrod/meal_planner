@@ -12,12 +12,13 @@ def get_category_days(year, month, category, end_date=None):
             if end_date and day >= end_date:
                 continue
             
-            # Tally up the days based on category rules
-            if category == 'weekday_lunch' and day.weekday() < 5: # 0-4 is Mon-Fri
+            # Tally up the days based on keywords in the category name
+            cat_name = category.lower()
+            if 'weekday' in cat_name and day.weekday() < 5: # 0-4 is Mon-Fri
                 days += 1
-            elif category == 'weekend_lunch' and day.weekday() >= 5: # 5-6 is Sat-Sun
+            elif 'weekend' in cat_name and day.weekday() >= 5: # 5-6 is Sat-Sun
                 days += 1
-            else:  # for dinner and any new categories, assume daily
+            elif 'weekday' not in cat_name and 'weekend' not in cat_name: # Everyday categories
                 days += 1
     return days
 
